@@ -84,18 +84,19 @@ class Updater(commands.Cog):
                 last_update = utilis.formatStrToDate(player.info['last_update'])
                 delta = now - last_update
                 player.info['last_update'] = utilis.formatDateToStr(now)
+                time_end = utilis.formatStrToDate(player.info['begin_construct_time']) + timedelta(minutes=player.info['time_to_construct'])
                 building_id = player.info['building_id']
                 building = Building(building_id=building_id)
                 await building.load(self.bot)
                 is_construct = building.construct(player, delta.total_seconds()/60)
-                if is_construct:
-                    salaire = player.info['total_construct_point']* player.info['ppp']
+                if is_construct or (time_end-now).total_seconds()<0:
+                    salaire = round(player.info['total_construct_point']* player.info['ppp'])
                     player.money += salaire
                     player.SetInfo(activity=PlayerActivity.WAIT)
                     user = await self.bot.fetch_user(player.id)
                     if user is not None:
                         await user.send(f"Tu as fini de travailler, tu as gagner {salaire}.")
-                    await player.save(self.bot)
+                await player.save(self.bot)
                 await building.save(self.bot)
 
     @tasks.loop(hours=1)
