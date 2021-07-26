@@ -236,6 +236,17 @@ def GetCoffreGfx(coffre, money=None):
     return im
 
 
-def estimateConstructPointByTime(player, time_as_seconds):
-    bstat = player.comp['constructeur']
-    return round(int(bstat + 1) * time_as_seconds / 60)
+def MakeLifeBar(pos , maximum, compt=6):
+    e1 = "🟩"
+    e2 = "🟥"
+    if maximum != 0:
+        d = pos / maximum
+    else:
+        d = 1
+    bar = ""
+    for i in range(0, compt):
+        if i < d * compt:
+            bar += e1
+        else:
+            bar += e2
+    return bar
