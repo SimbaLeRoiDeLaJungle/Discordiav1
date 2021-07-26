@@ -76,6 +76,7 @@ class Building(GameObject):
     def construct(self, player, time_in_minutes):
         point_per_minutes = player.GetConstructPointPerMinutes()
         self.info['life'] += point_per_minutes * time_in_minutes
+        player.info['total_construct_point'] += point_per_minutes * time_in_minutes
         if self.info['life'] >= self.info['max_life']:
             self.info['life'] = self.info['max_life']
             self.is_construct = True

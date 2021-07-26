@@ -6,6 +6,7 @@ from discord.ext import commands, tasks
 import json
 from datetime import datetime, timedelta
 
+from src.GameObject.Building import Building
 from src.GameObject.Map import SquareType
 from src.GameObject.Player import Player, PlayerActivity
 from src.GameObject.Seller import GetRandomSellerInfo
@@ -80,11 +81,22 @@ class Updater(commands.Cog):
                         user = await self.bot.fetch_user(player.id)
                         await user.send("Tu as finis de récolter des resources")
             elif player.info['activity'] == int(PlayerActivity.CONSTRUCT):
-                last_update = utilis.formatDateToStr(player.info['last_update'])
-                delta = datetime.now() - last_update
-                points = player.GetConstructPointPerMinutes()*delta.total_seconds()/60
-                player.info['activity']
-                player.info['last_update'] = utilis.formatDateToStr(datetime.now())
+                last_update = utilis.formatStrToDate(player.info['last_update'])
+                delta = now - last_update
+                player.info['last_update'] = utilis.formatDateToStr(now)
+                building_id = player.info['building_id']
+                building = Building(building_id=building_id)
+                await building.load(self.bot)
+                is_construct = building.construct(player, delta.total_seconds()/60)
+                if is_construct:
+                    salaire = player.info['total_construct_point']* player.info['ppp']
+                    player.money += salaire
+                    player.SetInfo(activity=PlayerActivity.WAIT)
+                    user = await self.bot.fetch_user(player.id)
+                    if user is not None:
+                        await user.send(f"Tu as fini de travailler, tu as gagner {salaire}.")
+                    await player.save(self.bot)
+                await building.save(self.bot)
 
     @tasks.loop(hours=1)
     async def update_seller(self):
