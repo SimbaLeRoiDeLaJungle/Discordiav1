@@ -5,12 +5,13 @@ from PIL import Image
 
 from src.GameObject.GameObject import GameObject
 
+import src.Utilitary as utilis
 
 class Building(GameObject):
     async def load(self, bot, **kwargs):
         async with bot.pool.acquire() as conn:
             async with conn.cursor() as cursor:
-                req = f"SELECT info, pos_x, pos_y, is_construct, building_type FROM buildings WHERE building_id = {self.id}"
+                req = f"SELECT info, pos_x, pos_y, is_construct, building_type, guild_id FROM buildings WHERE building_id = {self.id}"
                 await cursor.execute(req)
                 data = await cursor.fetchone()
                 await cursor.close()
@@ -20,6 +21,7 @@ class Building(GameObject):
             self.city_position = (data[1], data[2])
             self.is_construct = data[3]
             self.building_type = BuildingType(data[4])
+            self.guild_id = data[5]
 
     async def save(self, bot, **kwargs):
         async with bot.pool.acquire() as conn:
@@ -74,6 +76,8 @@ class Building(GameObject):
         self.city_position = None
 
     def construct(self, player, time_in_minutes):
+        if self.is_construct:
+            return True
         point_per_minutes = player.GetConstructPointPerMinutes()
         self.info['life'] += point_per_minutes * time_in_minutes
         player.info['total_construct_point'] += point_per_minutes * time_in_minutes
@@ -82,6 +86,10 @@ class Building(GameObject):
             self.is_construct = True
             return True
         return False
+    @property
+    def lifeBar(self):
+        return utilis.MakeLifeBar(self.info['life'], self.info['max_life'])
+
 
 class BuildingType(IntEnum):
     AUBERGE = 1
@@ -113,6 +121,27 @@ class BuildingType(IntEnum):
             return BuildingType.HABITATION
         elif string == "laboratoire":
             return BuildingType.LABORATOIRE
+
+    @staticmethod
+    def TypeToStr(building_type):
+        if building_type == BuildingType.AUBERGE:
+            return "auberge"
+        elif building_type == BuildingType.CABINET:
+            return "cabinet"
+        elif building_type == BuildingType.CASERNE:
+            return "caserne"
+        elif building_type == BuildingType.CHAMPS:
+            return "champs"
+        elif building_type == BuildingType.COMMERCE:
+            return "commerce"
+        elif building_type == BuildingType.ELEVAGE:
+            return "elevage"
+        elif building_type == BuildingType.FORGE:
+            return "forge"
+        elif building_type == BuildingType.HABITATION:
+            return "habitation"
+        elif building_type == BuildingType.LABORATOIRE:
+            return "laboratoire"
 
     @staticmethod
     def GetBuildingCost(buildingType):

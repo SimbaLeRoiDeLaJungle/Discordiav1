@@ -85,11 +85,13 @@ class WorksTrack(TrackAbstractBase):
                         content += "- "
                     content += f"_*{name}*_ ({building.city_position[0]}, {building.city_position[1]})\n"
                     content += f"salaire par points : {salaire} 💰\n"
+                    content += utilis.MakeLifeBar(building.info['life'], building.info['max_life']) + "\n"
                     content += "---------------\n"
                     index += 1
                     break
         content += "回~回~回~回~\n"
         content += f"__temps de travail :__ **{time}** minutes (⬅️ ➡️)\n"
-        estimation_pts = utilis.estimateConstructPointByTime(self.player, time*60)
-        content += f"__Estimation :__ {estimation_pts} point(s) (**{round(estimation_pts*current_sal, 2)}**💰)\n"
+
+        estimation_pts = self.player.GetConstructPointPerMinutes()*time
+        content += f"__Estimation :__ {estimation_pts} point(s) (**{round(estimation_pts*current_sal, 0)}**💰)\n"
         return content

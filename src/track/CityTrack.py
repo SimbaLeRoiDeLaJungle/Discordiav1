@@ -5,20 +5,24 @@ import discord
 import src.Utilitary as utilis
 from src.track.CitySubTrack.WorksTrack import WorksTrack
 from src.track.TrackAbstractBase import TrackAbstractBase
-
+from src.track.CitySubTrack.CityInfoTrack import CityInfoTrack
 from src.GameObject.Player import Player
 from src.GameObject.City import City
 
 class CityTrack(TrackAbstractBase):
     async def loop(self):
         try:
-            reaction, _ = await self.bot.wait_for('reaction_add',check= lambda r,u: utilis.defaultCheck(r, u, player=self.player, message=self.message, emoji_list=["0️⃣", "1️⃣"]))
+            reaction, _ = await self.bot.wait_for('reaction_add',check= lambda r,u: utilis.defaultCheck(r, u, player=self.player, message=self.message, emoji_list=["0️⃣", "1️⃣", "2️⃣"]))
             if str(reaction.emoji) == "0️⃣":
                 track = WorksTrack(self.bot, self.ctx)
                 await track.load()
                 await track.loop()
             elif str(reaction.emoji) == "1️⃣":
                 pass
+            elif str(reaction.emoji) == "2️⃣":
+                track = CityInfoTrack(self.bot, self.ctx)
+                await track.load()
+                await track.loop()
 
         except asyncio.TimeoutError:
             pass
@@ -34,6 +38,7 @@ class CityTrack(TrackAbstractBase):
                 self.message = await self.ctx.send(content=self.GetContent(), file=discord.File(fp=image_binary, filename='s.png'))
             await self.message.add_reaction("0️⃣")
             await self.message.add_reaction("1️⃣")
+            await self.message.add_reaction("2️⃣")
 
     def __init__(self, bot, ctx):
         super().__init__(bot, ctx)
@@ -44,4 +49,5 @@ class CityTrack(TrackAbstractBase):
     def GetContent(self):
         content = "0️⃣ travails\n"
         content += "1️⃣ forge\n"
+        content += "2️⃣ information\n"
         return content

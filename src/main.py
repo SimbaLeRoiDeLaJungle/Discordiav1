@@ -61,6 +61,11 @@ async def a(ctx):
     for key,_ in city.resource_info.items():
         city.resource_info[key] += 1000
     await city.save(bot)
+    epq = await Equipment.GetSpecimen(bot, 'haute-forme')
+    epq2 = await Equipment.GetSpecimen(bot, 'lance')
+    epq3 = await Equipment.GetSpecimen(bot, 'axes')
+    eqp4 = await Equipment.GetSpecimen(bot, 'fleau')
+    await Player.AddEquipementsToCoffre(bot, ctx.author.id, [epq, epq2,epq3,eqp4])
 
 @bot.command()
 async def map(ctx, *args):

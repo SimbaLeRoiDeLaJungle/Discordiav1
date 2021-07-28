@@ -7,6 +7,7 @@ import json
 from datetime import datetime, timedelta
 
 from src.GameObject.Building import Building
+from src.GameObject.City import City
 from src.GameObject.Map import SquareType
 from src.GameObject.Player import Player, PlayerActivity
 from src.GameObject.Seller import GetRandomSellerInfo
@@ -92,10 +93,14 @@ class Updater(commands.Cog):
                 if is_construct or (time_end-now).total_seconds()<0:
                     salaire = round(player.info['total_construct_point']* player.info['ppp'])
                     player.money += salaire
+                    city = City(building.guild_id)
+                    await city.load(self.bot)
+                    city.resource_info['money'] -= salaire
+                    await city.save(self.bot)
                     player.SetInfo(activity=PlayerActivity.WAIT)
                     user = await self.bot.fetch_user(player.id)
                     if user is not None:
-                        await user.send(f"Tu as fini de travailler, tu as gagner {salaire}.")
+                        await user.send(f"Tu as fini de travailler, tu as gagner {salaire} pièces d'or.")
                 await player.save(self.bot)
                 await building.save(self.bot)
 

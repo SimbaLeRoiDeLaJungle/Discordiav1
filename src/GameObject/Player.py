@@ -410,6 +410,7 @@ class Player(GameObject):
             self.info['time_to_construct'] = time_to_construct
             self.info['begin_construct_time'] = utilis.formatDateToStr(datetime.now())
             self.info['last_update'] = self.info['begin_construct_time']
+
     def GetTheBestNearSquare(self, dest):
         pos = (self.pos_x, self.pos_y)
         temp = abs(pos[0] - dest[0]) + abs(pos[1] - dest[1])
@@ -598,3 +599,5 @@ def PlayerActivityToString(player_activity):
         return "déplacement + recherche"
     elif player_activity == PlayerActivity.COLLECT:
         return "collect de ressources"
+    elif player_activity == PlayerActivity.CONSTRUCT:
+        return "contruction"

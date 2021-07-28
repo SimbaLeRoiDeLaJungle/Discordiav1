@@ -111,7 +111,6 @@ class CoffreTrack(TrackAbstractBase):
             pass
 
     async def load(self, **kwargs):
-
         self.player = Player(self.ctx.author.id)
         await self.player.StopAllUserTasks(self.bot)
         await self.player.load(self.bot)
@@ -123,12 +122,13 @@ class CoffreTrack(TrackAbstractBase):
             self.message = await self.ctx.send(f"{self.ctx.author.mention}",
                                                file=discord.File(fp=image_binary, filename='s.png'))
         self.task_id = self.message.id
+        await Player.AddUserTask(self.bot, self.task_id, self.player.id)
 
     def __init__(self, bot, ctx):
         super().__init__(bot, ctx)
         self.player = None
         self.message = None
-        self.coffre = {'equipment': [], 'consumable': dict()}
+        self.coffre = dict()
         self.task_id = None
 
 

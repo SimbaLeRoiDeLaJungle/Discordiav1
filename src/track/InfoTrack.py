@@ -38,12 +38,12 @@ class InfoTrack(TrackAbstractBase):
             dest = self.player.info['destination']
             content += f"__arrivée dans :__ {utilis.FloatSecondToStr(self.player.estimate_time_from_distance()*60)} (estimation)\n"
             content += f"__destination :__ ({dest[0]}, {dest[1]})"
-        if activity == PlayerActivity.MOVETOSEARCH:
+        elif activity == PlayerActivity.MOVETOSEARCH:
             dest = self.player.info['destination']
             content += f"__arrivée dans :__ {utilis.FloatSecondToStr(self.player.estimate_time_from_distance()*60)} (estimation)\n"
             content += f"__durée de la recherche :__ {utilis.FloatSecondToStr(self.player.info['time_to_search']*60)}"
             content += f"__destination :__ ({dest[0]}, {dest[1]})"
-        if activity == PlayerActivity.SEARCH:
+        elif activity == PlayerActivity.SEARCH:
             b_time = utilis.formatStrToDate(self.player.info["time_begin_search"])
             delta = timedelta(minutes=self.player.info['time_to_search'])
             end_time = b_time + delta
@@ -52,6 +52,13 @@ class InfoTrack(TrackAbstractBase):
             if rest<0:
                 rest=0
             content += f"__fin dans :__ {utilis.FloatSecondToStr(rest)}\n"
+        elif activity == PlayerActivity.CONSTRUCT:
+            begin_time = utilis.formatStrToDate(self.player.info['begin_construct_time'])
+            delta = timedelta(minutes=self.player.info['time_to_construct'])
+            end_time = begin_time + delta
+            delta = end_time - datetime.now()
+            content += f"__fin dans :__ {utilis.FloatSecondToStr(delta.total_seconds())}\n"
+
         if city is not None:
             content += f"Tu peux rentrer dans la ville : **{city.name}** en rejoignant le serveur suivant : {city.invite_link}"
 
